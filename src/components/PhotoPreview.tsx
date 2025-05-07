@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CameraCapturedPicture } from "expo-camera";
 
-import FooterCard from "@/components/FooterCard";
+import Card from "@/components/Card";
 
 type PhotoPreviewProps = {
   photo: CameraCapturedPicture;
@@ -19,7 +19,7 @@ export default function PhotoPreview({
   return (
     <ImageBackground style={{ flex: 1 }} source={{ uri: photo.uri }}>
       <SafeAreaView style={{ flex: 1 }}>
-        <FooterCard>
+        <Card style={{ margin: 12, marginTop: "auto" }}>
           <View style={styles.controlsContainer}>
             <Ionicons
               style={styles.controlIcon}
@@ -37,7 +37,7 @@ export default function PhotoPreview({
               onPress={onSave}
             />
           </View>
-        </FooterCard>
+        </Card>
       </SafeAreaView>
     </ImageBackground>
   );

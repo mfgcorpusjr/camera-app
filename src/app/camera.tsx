@@ -1,44 +1,37 @@
-import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, View, Text } from "react-native";
-import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useState, useRef } from "react";
+import { StyleSheet, View } from "react-native";
+
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   useCameraPermissions,
   CameraView,
   CameraType,
   CameraCapturedPicture,
 } from "expo-camera";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import CameraPermission from "@/components/CameraPermission";
 import PhotoPreview from "@/components/PhotoPreview";
-import FooterCard from "@/components/FooterCard";
+import Card from "@/components/Card";
+import Controls from "@/components/Controls";
 
-type Mode = "Photo" | "Video";
+import { Mode } from "@/types";
 
 export default function CameraScreen() {
   const [mode, setMode] = useState<Mode>("Photo");
   const [facing, setFacing] = useState<CameraType>("back");
-  const cameraRef = useRef<CameraView>(null);
   const [photo, setPhoto] = useState<CameraCapturedPicture>();
+
+  const cameraRef = useRef<CameraView>(null);
 
   const [permission, requestPermission] = useCameraPermissions();
 
-  useEffect(() => {
-    if (permission && !permission.granted) {
-      requestPermission();
-    }
-  }, [permission]);
+  const handleChangeFacing = () =>
+    setFacing(facing === "back" ? "front" : "back");
 
-  const toggleFacing = () => setFacing(facing === "back" ? "front" : "back");
-
-  const takePhoto = async () => {
-    const photo = await cameraRef.current?.takePictureAsync();
-    setPhoto(photo);
-  };
-
-  const handleShutter = () => {
+  const handlePressShutter = async () => {
     if (mode === "Photo") {
-      takePhoto();
+      const photo = await cameraRef.current?.takePictureAsync();
+      setPhoto(photo);
     } else {
       console.log("record video");
     }
@@ -46,6 +39,10 @@ export default function CameraScreen() {
 
   if (!permission) {
     return <View />;
+  }
+
+  if (!permission.granted) {
+    return <CameraPermission onPressEnableCamera={requestPermission} />;
   }
 
   if (photo) {
@@ -63,92 +60,15 @@ export default function CameraScreen() {
       <CameraView style={{ flex: 1 }} ref={cameraRef} facing={facing} mirror />
 
       <SafeAreaView style={StyleSheet.absoluteFill}>
-        <FooterCard>
-          <View style={styles.modeContainer}>
-            <Text
-              style={[
-                styles.modeText,
-                mode === "Photo" && styles.selectedModeText,
-              ]}
-              onPress={() => setMode("Photo")}
-            >
-              Photo
-            </Text>
-            <Text
-              style={[
-                styles.modeText,
-                mode === "Video" && styles.selectedModeText,
-              ]}
-              onPress={() => setMode("Video")}
-            >
-              Video
-            </Text>
-          </View>
-
-          <View style={styles.controlsContainer}>
-            <Ionicons
-              style={styles.controlIcon}
-              name="close-outline"
-              size={24}
-              color="white"
-              onPress={() => router.back()}
-            />
-
-            <View style={styles.shutter}>
-              <Ionicons
-                name={mode === "Photo" ? "camera-outline" : "videocam-outline"}
-                size={24}
-                color="white"
-                onPress={handleShutter}
-              />
-            </View>
-
-            <Ionicons
-              style={styles.controlIcon}
-              name="camera-reverse-outline"
-              size={24}
-              color="white"
-              onPress={toggleFacing}
-            />
-          </View>
-        </FooterCard>
+        <Card style={{ margin: 12, marginTop: "auto" }}>
+          <Controls
+            mode={mode}
+            onChangeMode={(mode: Mode) => setMode(mode)}
+            onPressShutter={handlePressShutter}
+            onChangeFacing={handleChangeFacing}
+          />
+        </Card>
       </SafeAreaView>
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  modeContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 60,
-  },
-  modeText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  selectedModeText: {
-    color: "deeppink",
-  },
-  controlsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  controlIcon: {
-    backgroundColor: "black",
-    padding: 12,
-    borderRadius: 50,
-  },
-  shutter: {
-    backgroundColor: "deeppink",
-    width: 80,
-    height: 80,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 4,
-    borderColor: "white",
-    borderRadius: 40,
-  },
-});
