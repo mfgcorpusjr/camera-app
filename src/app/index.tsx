@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   floatingButton: {
-    backgroundColor: "black",
+    backgroundColor: "deeppink",
     padding: 12,
     borderRadius: 50,
     position: "absolute",
