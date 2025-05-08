@@ -4,6 +4,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { CameraMode } from "expo-camera";
 
+import colors from "@/constants/colors";
+
 type ControlsProps = {
   mode: CameraMode;
   isRecording?: boolean;
@@ -83,7 +85,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   selectedMode: {
-    color: "deeppink",
+    color: colors.tint,
   },
   actionsContainer: {
     flexDirection: "row",
@@ -96,7 +98,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   shutter: {
-    backgroundColor: "deeppink",
+    backgroundColor: colors.tint,
     width: 60,
     height: 60,
     justifyContent: "center",

@@ -1,12 +1,21 @@
 import React, { useState, useCallback } from "react";
-import { StyleSheet, View, Pressable, FlatList, Image } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  FlatList,
+  Image,
+  Text,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, useFocusEffect } from "expo-router";
 import * as FileSystem from "expo-file-system";
 import * as VideoThumbnails from "expo-video-thumbnails";
 
-import { getMediaType } from "@/utils/media";
+import { getMediumType } from "@/utils/media";
+
+import colors from "@/constants/colors";
 
 type Medium = {
   name: string;
@@ -20,13 +29,7 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       const generateThumbnail = async (uri: string) => {
-        const { uri: thumbnail } = await VideoThumbnails.getThumbnailAsync(
-          uri,
-          {
-            time: 0,
-          }
-        );
-
+        const { uri: thumbnail } = await VideoThumbnails.getThumbnailAsync(uri);
         return thumbnail;
       };
 
@@ -40,7 +43,7 @@ export default function HomeScreen() {
             response.map(async (name) => {
               const uri = FileSystem.documentDirectory + name;
               const thumbnail =
-                getMediaType(uri) === "picture"
+                getMediumType(uri) === "picture"
                   ? ""
                   : await generateThumbnail(uri);
 
@@ -60,10 +63,10 @@ export default function HomeScreen() {
     }, [])
   );
 
-  const renderMedia = (item: Medium) => {
-    const mediaType = getMediaType(item.uri);
+  const renderMedium = (item: Medium) => {
+    const mediumType = getMediumType(item.uri);
 
-    if (mediaType === "picture") {
+    if (mediumType === "picture") {
       return <Image style={styles.medium} source={{ uri: item.uri }} />;
     } else {
       return (
@@ -88,10 +91,13 @@ export default function HomeScreen() {
           renderItem={({ item }) => (
             <Link href={`/${item.name}`} asChild>
               <Pressable style={styles.mediumContainer}>
-                {renderMedia(item)}
+                {renderMedium(item)}
               </Pressable>
             </Link>
           )}
+          ListEmptyComponent={
+            <Text style={{ textAlign: "center" }}>No media found.</Text>
+          }
           numColumns={3}
           contentContainerStyle={{ gap: 2 }}
           columnWrapperStyle={{ gap: 2 }}
@@ -113,7 +119,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   floatingButton: {
-    backgroundColor: "deeppink",
+    backgroundColor: colors.tint,
     padding: 12,
     borderRadius: 50,
     position: "absolute",

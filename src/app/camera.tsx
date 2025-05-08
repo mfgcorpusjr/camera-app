@@ -102,7 +102,6 @@ export default function CameraScreen() {
         ref={cameraRef}
         facing={facing}
         mode={mode}
-        mirror
       />
 
       <SafeAreaView style={StyleSheet.absoluteFill}>

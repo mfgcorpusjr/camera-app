@@ -6,7 +6,7 @@ import { useVideoPlayer, VideoView } from "expo-video";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 
-import { getMediaType } from "@/utils/media";
+import { getMediumType } from "@/utils/media";
 
 export default function MediaDetailsScreen() {
   const { name } = useLocalSearchParams();
@@ -38,7 +38,7 @@ export default function MediaDetailsScreen() {
   const handleSave = async () => {
     await MediaLibrary.saveToLibraryAsync(uri);
     Alert.alert(
-      `${getMediaType(uri) === "picture" ? "Picture" : "Video"} Saved`
+      `${getMediumType(uri) === "picture" ? "Picture" : "Video"} Saved`
     );
   };
 
@@ -65,7 +65,7 @@ export default function MediaDetailsScreen() {
         }}
       />
 
-      {getMediaType(uri) === "picture" ? (
+      {getMediumType(uri) === "picture" ? (
         <Image style={{ flex: 1 }} source={{ uri }} />
       ) : (
         <VideoView
