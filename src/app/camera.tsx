@@ -2,12 +2,15 @@ import React, { useState, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
 import {
   useCameraPermissions,
   CameraView,
   CameraType,
   CameraCapturedPicture,
 } from "expo-camera";
+import * as FileSystem from "expo-file-system";
+import path from "path";
 
 import CameraPermission from "@/components/CameraPermission";
 import PhotoPreview from "@/components/PhotoPreview";
@@ -25,7 +28,7 @@ export default function CameraScreen() {
 
   const [permission, requestPermission] = useCameraPermissions();
 
-  const handleChangeFacing = () =>
+  const handleToggleFacing = () =>
     setFacing(facing === "back" ? "front" : "back");
 
   const handlePressShutter = async () => {
@@ -34,6 +37,20 @@ export default function CameraScreen() {
       setPhoto(photo);
     } else {
       console.log("record video");
+    }
+  };
+
+  const handleSave = () => {
+    if (mode === "Photo" && photo) {
+      const name = path.basename(photo.uri);
+
+      FileSystem.copyAsync({
+        from: photo.uri,
+        to: FileSystem.documentDirectory + name,
+      });
+
+      setPhoto(undefined);
+      router.back();
     }
   };
 
@@ -50,7 +67,7 @@ export default function CameraScreen() {
       <PhotoPreview
         photo={photo}
         onDiscard={() => setPhoto(undefined)}
-        onSave={() => {}}
+        onSave={handleSave}
       />
     );
   }
@@ -65,7 +82,7 @@ export default function CameraScreen() {
             mode={mode}
             onChangeMode={(mode: Mode) => setMode(mode)}
             onPressShutter={handlePressShutter}
-            onChangeFacing={handleChangeFacing}
+            onToggleFacing={handleToggleFacing}
           />
         </Card>
       </SafeAreaView>

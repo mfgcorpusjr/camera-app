@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
@@ -9,14 +9,14 @@ type ControlsProps = {
   mode: Mode;
   onChangeMode: (mode: Mode) => void;
   onPressShutter: () => void;
-  onChangeFacing: () => void;
+  onToggleFacing: () => void;
 };
 
 export default function Controls({
   mode,
   onChangeMode,
   onPressShutter,
-  onChangeFacing,
+  onToggleFacing,
 }: ControlsProps) {
   return (
     <View style={{ gap: 20 }}>
@@ -44,21 +44,20 @@ export default function Controls({
           onPress={() => router.back()}
         />
 
-        <View style={styles.shutter}>
+        <Pressable style={styles.shutter} onPress={onPressShutter}>
           <Ionicons
             name={mode === "Photo" ? "camera-outline" : "videocam-outline"}
             size={24}
             color="white"
-            onPress={onPressShutter}
           />
-        </View>
+        </Pressable>
 
         <Ionicons
           style={styles.actionIcon}
           name="camera-reverse-outline"
           size={24}
           color="white"
-          onPress={onChangeFacing}
+          onPress={onToggleFacing}
         />
       </View>
     </View>
