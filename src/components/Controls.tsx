@@ -6,6 +6,7 @@ import { CameraMode } from "expo-camera";
 
 type ControlsProps = {
   mode: CameraMode;
+  isRecording?: boolean;
   onChangeMode: (mode: CameraMode) => void;
   onPressShutter: () => void;
   onToggleFacing: () => void;
@@ -13,6 +14,7 @@ type ControlsProps = {
 
 export default function Controls({
   mode,
+  isRecording,
   onChangeMode,
   onPressShutter,
   onToggleFacing,
@@ -45,7 +47,13 @@ export default function Controls({
 
         <Pressable style={styles.shutter} onPress={onPressShutter}>
           <Ionicons
-            name={mode === "picture" ? "camera-outline" : "videocam-outline"}
+            name={
+              mode === "picture"
+                ? "camera-outline"
+                : isRecording
+                ? "stop-outline"
+                : "videocam-outline"
+            }
             size={24}
             color="white"
           />

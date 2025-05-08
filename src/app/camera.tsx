@@ -1,6 +1,5 @@
 import React, { useState, useRef } from "react";
 import { StyleSheet, View } from "react-native";
-
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import {
@@ -15,6 +14,7 @@ import path from "path";
 
 import CameraPermission from "@/components/CameraPermission";
 import PicturePreview from "@/components/PicturePreview";
+import VideoPreview from "@/components/VideoPreview";
 import Card from "@/components/Card";
 import Controls from "@/components/Controls";
 
@@ -22,6 +22,8 @@ export default function CameraScreen() {
   const [mode, setMode] = useState<CameraMode>("picture");
   const [facing, setFacing] = useState<CameraType>("back");
   const [picture, setPicture] = useState<CameraCapturedPicture>();
+  const [isRecording, setIsRecording] = useState(false);
+  const [video, setVideo] = useState("");
 
   const cameraRef = useRef<CameraView>(null);
 
@@ -30,27 +32,39 @@ export default function CameraScreen() {
   const handleToggleFacing = () =>
     setFacing(facing === "back" ? "front" : "back");
 
-  const handlePressShutter = async () => {
-    if (mode === "picture") {
-      const picture = await cameraRef.current?.takePictureAsync();
-      setPicture(picture);
-    } else {
-      console.log("record video");
+  const handleTakePicture = async () => {
+    const picture = await cameraRef.current?.takePictureAsync();
+    setPicture(picture);
+  };
+
+  const handleStartRecording = async () => {
+    setIsRecording(true);
+    const video = await cameraRef.current?.recordAsync({ maxDuration: 10 });
+    if (video) {
+      setVideo(video.uri);
     }
+    setIsRecording(false);
+  };
+
+  const handleStopRecording = () => {
+    cameraRef.current?.stopRecording();
+    setIsRecording(false);
   };
 
   const handleSave = () => {
-    if (mode === "picture" && picture) {
-      const name = path.basename(picture.uri);
+    const uri = mode === "picture" && picture ? picture.uri : video;
 
-      FileSystem.copyAsync({
-        from: picture.uri,
-        to: FileSystem.documentDirectory + name,
-      });
+    const name = path.basename(uri);
 
-      setPicture(undefined);
-      router.back();
-    }
+    FileSystem.copyAsync({
+      from: uri,
+      to: FileSystem.documentDirectory + name,
+    });
+
+    setPicture(undefined);
+    setVideo("");
+
+    router.back();
   };
 
   if (!permission) {
@@ -71,16 +85,39 @@ export default function CameraScreen() {
     );
   }
 
+  if (video) {
+    return (
+      <VideoPreview
+        video={video}
+        onDiscard={() => setVideo("")}
+        onSave={handleSave}
+      />
+    );
+  }
+
   return (
     <>
-      <CameraView style={{ flex: 1 }} ref={cameraRef} facing={facing} mirror />
+      <CameraView
+        style={{ flex: 1 }}
+        ref={cameraRef}
+        facing={facing}
+        mode={mode}
+        mirror
+      />
 
       <SafeAreaView style={StyleSheet.absoluteFill}>
         <Card style={{ margin: 12, marginTop: "auto" }}>
           <Controls
             mode={mode}
+            isRecording={isRecording}
             onChangeMode={(mode: CameraMode) => setMode(mode)}
-            onPressShutter={handlePressShutter}
+            onPressShutter={
+              mode === "picture"
+                ? handleTakePicture
+                : isRecording
+                ? handleStopRecording
+                : handleStartRecording
+            }
             onToggleFacing={handleToggleFacing}
           />
         </Card>

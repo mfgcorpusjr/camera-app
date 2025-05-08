@@ -2,6 +2,7 @@ import { StyleSheet, View, Image, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, Stack, router } from "expo-router";
+import { useVideoPlayer, VideoView } from "expo-video";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 
@@ -11,6 +12,11 @@ export default function MediaDetailsScreen() {
   const { name } = useLocalSearchParams();
 
   const uri = (FileSystem.documentDirectory || "") + name;
+
+  const player = useVideoPlayer(uri, (player) => {
+    player.loop = true;
+    player.play();
+  });
 
   const handleDelete = async () => {
     Alert.alert("Delete Media", "Are you sure you want to delete?", [
@@ -59,7 +65,16 @@ export default function MediaDetailsScreen() {
         }}
       />
 
-      <Image style={{ flex: 1 }} source={{ uri }} />
+      {getMediaType(uri) === "picture" ? (
+        <Image style={{ flex: 1 }} source={{ uri }} />
+      ) : (
+        <VideoView
+          style={{ flex: 1 }}
+          player={player}
+          allowsFullscreen
+          contentFit="cover"
+        />
+      )}
     </SafeAreaView>
   );
 }
