@@ -21,7 +21,7 @@ export default function CameraPermission({
 
           <Text style={styles.title}>Enable Camera</Text>
           <Text style={styles.subTitle}>
-            We'll need this to take photos or record video.
+            We'll need this to take pictures or record videos.
           </Text>
         </View>
 

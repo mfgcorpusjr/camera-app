@@ -5,19 +5,19 @@ import { CameraCapturedPicture } from "expo-camera";
 
 import Card from "@/components/Card";
 
-type PhotoPreviewProps = {
-  photo: CameraCapturedPicture;
+type PicturePreviewProps = {
+  picture: CameraCapturedPicture;
   onDiscard: () => void;
   onSave: () => void;
 };
 
-export default function PhotoPreview({
-  photo,
+export default function PicturePreview({
+  picture,
   onDiscard,
   onSave,
-}: PhotoPreviewProps) {
+}: PicturePreviewProps) {
   return (
-    <ImageBackground style={{ flex: 1 }} source={{ uri: photo.uri }}>
+    <ImageBackground style={{ flex: 1 }} source={{ uri: picture.uri }}>
       <SafeAreaView style={{ flex: 1 }}>
         <Card style={{ margin: 12, marginTop: "auto" }}>
           <View style={styles.controlsContainer}>

@@ -31,7 +31,9 @@ export default function MediaDetailsScreen() {
 
   const handleSave = async () => {
     await MediaLibrary.saveToLibraryAsync(uri);
-    Alert.alert(`${getMediaType(uri)} Saved`);
+    Alert.alert(
+      `${getMediaType(uri) === "picture" ? "Picture" : "Video"} Saved`
+    );
   };
 
   return (

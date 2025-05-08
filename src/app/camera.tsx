@@ -8,21 +8,20 @@ import {
   CameraView,
   CameraType,
   CameraCapturedPicture,
+  CameraMode,
 } from "expo-camera";
 import * as FileSystem from "expo-file-system";
 import path from "path";
 
 import CameraPermission from "@/components/CameraPermission";
-import PhotoPreview from "@/components/PhotoPreview";
+import PicturePreview from "@/components/PicturePreview";
 import Card from "@/components/Card";
 import Controls from "@/components/Controls";
 
-import { Mode } from "@/types";
-
 export default function CameraScreen() {
-  const [mode, setMode] = useState<Mode>("Photo");
+  const [mode, setMode] = useState<CameraMode>("picture");
   const [facing, setFacing] = useState<CameraType>("back");
-  const [photo, setPhoto] = useState<CameraCapturedPicture>();
+  const [picture, setPicture] = useState<CameraCapturedPicture>();
 
   const cameraRef = useRef<CameraView>(null);
 
@@ -32,24 +31,24 @@ export default function CameraScreen() {
     setFacing(facing === "back" ? "front" : "back");
 
   const handlePressShutter = async () => {
-    if (mode === "Photo") {
-      const photo = await cameraRef.current?.takePictureAsync();
-      setPhoto(photo);
+    if (mode === "picture") {
+      const picture = await cameraRef.current?.takePictureAsync();
+      setPicture(picture);
     } else {
       console.log("record video");
     }
   };
 
   const handleSave = () => {
-    if (mode === "Photo" && photo) {
-      const name = path.basename(photo.uri);
+    if (mode === "picture" && picture) {
+      const name = path.basename(picture.uri);
 
       FileSystem.copyAsync({
-        from: photo.uri,
+        from: picture.uri,
         to: FileSystem.documentDirectory + name,
       });
 
-      setPhoto(undefined);
+      setPicture(undefined);
       router.back();
     }
   };
@@ -62,11 +61,11 @@ export default function CameraScreen() {
     return <CameraPermission onPressEnableCamera={requestPermission} />;
   }
 
-  if (photo) {
+  if (picture) {
     return (
-      <PhotoPreview
-        photo={photo}
-        onDiscard={() => setPhoto(undefined)}
+      <PicturePreview
+        picture={picture}
+        onDiscard={() => setPicture(undefined)}
         onSave={handleSave}
       />
     );
@@ -80,7 +79,7 @@ export default function CameraScreen() {
         <Card style={{ margin: 12, marginTop: "auto" }}>
           <Controls
             mode={mode}
-            onChangeMode={(mode: Mode) => setMode(mode)}
+            onChangeMode={(mode: CameraMode) => setMode(mode)}
             onPressShutter={handlePressShutter}
             onToggleFacing={handleToggleFacing}
           />

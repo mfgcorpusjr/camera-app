@@ -2,12 +2,11 @@ import React from "react";
 import { StyleSheet, View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-
-import { Mode } from "@/types";
+import { CameraMode } from "expo-camera";
 
 type ControlsProps = {
-  mode: Mode;
-  onChangeMode: (mode: Mode) => void;
+  mode: CameraMode;
+  onChangeMode: (mode: CameraMode) => void;
   onPressShutter: () => void;
   onToggleFacing: () => void;
 };
@@ -22,14 +21,14 @@ export default function Controls({
     <View style={{ gap: 20 }}>
       <View style={styles.modeContainer}>
         <Text
-          style={[styles.mode, mode === "Photo" && styles.selectedMode]}
-          onPress={() => onChangeMode("Photo")}
+          style={[styles.mode, mode === "picture" && styles.selectedMode]}
+          onPress={() => onChangeMode("picture")}
         >
-          Photo
+          Picture
         </Text>
         <Text
-          style={[styles.mode, mode === "Video" && styles.selectedMode]}
-          onPress={() => onChangeMode("Video")}
+          style={[styles.mode, mode === "video" && styles.selectedMode]}
+          onPress={() => onChangeMode("video")}
         >
           Video
         </Text>
@@ -46,7 +45,7 @@ export default function Controls({
 
         <Pressable style={styles.shutter} onPress={onPressShutter}>
           <Ionicons
-            name={mode === "Photo" ? "camera-outline" : "videocam-outline"}
+            name={mode === "picture" ? "camera-outline" : "videocam-outline"}
             size={24}
             color="white"
           />
