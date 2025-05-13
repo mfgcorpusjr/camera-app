@@ -1,14 +1,8 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 import { StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import {
-  useCameraPermissions,
-  CameraView,
-  CameraType,
-  CameraCapturedPicture,
-  CameraMode,
-} from "expo-camera";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useCameraPermissions, CameraView, CameraMode } from "expo-camera";
 import * as FileSystem from "expo-file-system";
 import path from "path";
 
@@ -18,45 +12,33 @@ import VideoPreview from "@/components/VideoPreview";
 import Card from "@/components/Card";
 import Controls from "@/components/Controls";
 
+import useCamera from "@/hooks/useCamera";
+import useFileSystem from "@/hooks/useFileSystem";
+
 export default function CameraScreen() {
-  const [mode, setMode] = useState<CameraMode>("picture");
-  const [facing, setFacing] = useState<CameraType>("back");
-  const [picture, setPicture] = useState<CameraCapturedPicture>();
-  const [isRecording, setIsRecording] = useState(false);
-  const [video, setVideo] = useState("");
-
-  const cameraRef = useRef<CameraView>(null);
-
   const [permission, requestPermission] = useCameraPermissions();
+  const {
+    cameraRef,
+    mode,
+    setMode,
+    facing,
+    picture,
+    setPicture,
+    isRecording,
+    video,
+    setVideo,
+    handleToggleFacing,
+    handleTakePicture,
+    handleStartRecording,
+    handleStopRecording,
+  } = useCamera();
+  const { saveToFileSystem } = useFileSystem();
 
-  const handleToggleFacing = () =>
-    setFacing(facing === "back" ? "front" : "back");
-
-  const handleTakePicture = async () => {
-    const picture = await cameraRef.current?.takePictureAsync();
-    setPicture(picture);
-  };
-
-  const handleStartRecording = async () => {
-    setIsRecording(true);
-    const video = await cameraRef.current?.recordAsync({ maxDuration: 10 });
-    if (video) {
-      setVideo(video.uri);
-    }
-    setIsRecording(false);
-  };
-
-  const handleStopRecording = () => {
-    cameraRef.current?.stopRecording();
-    setIsRecording(false);
-  };
-
-  const handleSave = () => {
+  const handleSave = async () => {
     const uri = mode === "picture" && picture ? picture.uri : video;
-
     const name = path.basename(uri);
 
-    FileSystem.copyAsync({
+    await saveToFileSystem({
       from: uri,
       to: FileSystem.documentDirectory + name,
     });

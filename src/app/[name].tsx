@@ -6,10 +6,14 @@ import { useVideoPlayer, VideoView } from "expo-video";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 
+import useFileSystem from "@/hooks/useFileSystem";
+
 import { getMediumType } from "@/utils/media";
 
 export default function MediaDetailsScreen() {
   const { name } = useLocalSearchParams();
+
+  const { deleteFromFileSystem } = useFileSystem();
 
   const uri = (FileSystem.documentDirectory || "") + name;
 
@@ -28,7 +32,7 @@ export default function MediaDetailsScreen() {
         text: "Delete",
         style: "destructive",
         onPress: async () => {
-          await FileSystem.deleteAsync(uri);
+          await deleteFromFileSystem({ uri });
           router.back();
         },
       },

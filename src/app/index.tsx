@@ -13,6 +13,8 @@ import { Link, useFocusEffect } from "expo-router";
 import * as FileSystem from "expo-file-system";
 import * as VideoThumbnails from "expo-video-thumbnails";
 
+import useFileSystem from "@/hooks/useFileSystem";
+
 import { getMediumType } from "@/utils/media";
 
 import colors from "@/constants/colors";
@@ -26,6 +28,8 @@ type Medium = {
 export default function HomeScreen() {
   const [media, setMedia] = useState<Medium[]>([]);
 
+  const { loadFromFileSystem } = useFileSystem();
+
   useFocusEffect(
     useCallback(() => {
       const generateThumbnail = async (uri: string) => {
@@ -35,9 +39,9 @@ export default function HomeScreen() {
 
       const loadData = async () => {
         if (FileSystem.documentDirectory) {
-          const response = await FileSystem.readDirectoryAsync(
-            FileSystem.documentDirectory
-          );
+          const response = await loadFromFileSystem({
+            uri: FileSystem.documentDirectory,
+          });
 
           const data: Medium[] = await Promise.all(
             response.map(async (name) => {
